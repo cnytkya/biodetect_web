@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitki Türü Sınıflandırması</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Bitki Türü Sınıflandırması (CNN)</h1>
+        <p>Hastalık veya sağlıklı bitki yaprağı görüntüsü yükleyerek sınıflandırma yapın.</p>
+
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="file-input" name="file" accept="image/*">
+            <button type="submit">Tahmin Et</button>
+        </form>
+
+        <div id="loading" style="display: none;">Yükleniyor...</div>
+
+        <div id="result">
+            <h2>Tahmin Sonucu:</h2>
+            <p id="predicted-class"></p>
+            <p id="confidence"></p>
+            <img id="uploaded-image" src="#" alt="Yüklenen Resim" style="display:none; max-width: 300px; margin-top: 20px;">
+        </div>
+
+        <div id="error-message" style="color: red; margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('file-input');
+            const uploadedImage = document.getElementById('uploaded-image');
+            const predictedClassElement = document.getElementById('predicted-class');
+            const confidenceElement = document.getElementById('confidence');
+            const loadingElement = document.getElementById('loading');
+            const errorMessageElement = document.getElementById('error-message');
+
+            predictedClassElement.textContent = '';
+            confidenceElement.textContent = '';
+            uploadedImage.style.display = 'none';
+            errorMessageElement.textContent = '';
+            loadingElement.style.display = 'block';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage.src = e.target.result;
+                    uploadedImage.style.display = 'block';
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    errorMessageElement.textContent = 'Hata: ' + data.error;
+                } else {
+                    predictedClassElement.textContent = `Sınıf: ${data.predicted_class}`;
+                    confidenceElement.textContent = `Güven: ${data.confidence}`;
+                }
+            } catch (error) {
+                errorMessageElement.textContent = 'Bir ağ hatası oluştu: ' + error.message;
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
