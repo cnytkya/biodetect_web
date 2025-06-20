@@ -40,11 +40,11 @@ def objective(trial):
     learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 1e-2) # Logaritmik ölçekte öğrenme oranı
     optimizer_name = trial.suggest_categorical('optimizer', ['adam', 'rmsprop', 'sgd'])
     
-    # Model mimarisi için hiperparametreler
+    # Model mimarisi için hiperparametreler.
     num_conv_layers = trial.suggest_int('num_conv_layers', 2, 4) # 2 ile 4 arasında katman sayısı
     filters_per_layer = trial.suggest_categorical('filters_per_layer', [32, 64, 128]) # Her katman için başlangıç filtre sayısı
 
-    # Modeli oluştur
+    # Modeli oluşturma
     model = Sequential()
     
     # İlk Conv katmanı
@@ -53,7 +53,6 @@ def objective(trial):
 
     # Ek Conv katmanları
     for i in range(num_conv_layers - 1): # İlk katman zaten eklendiği için -1
-        # Filtre sayısını her katmanda ikiye katla veya sabit tutmak isterseniz filters_per_layer kullanın.
         # Şu anki mantık, ilk katmanın filtre sayısını baz alıp artırıyor.
         model.add(Conv2D(filters_per_layer * (2**(i+1)), (3, 3), activation='relu'))
         model.add(MaxPooling2D((2, 2)))
@@ -106,7 +105,7 @@ if __name__ == '__main__':
 
     # Sınıf indekslerini kaydet (Optuna optimizasyonundan önce yapılır ve tek seferliktir)
     class_indices_path = 'models/class_indices.json'
-    # GLOBAL_NUM_CLASSES'ı belirlerken kullanılan temp_train_generator'ı kontrol et
+    # GLOBAL_NUM_CLASSES'ı belirlerken kullanılan temp_train_generator'ı kontrol etmemiz gerekir. buraya tekrar dönemem lazım
     # Bu kısmın doğru çalışması için temp_train_generator'ın var olması ve sınıf_indices'in dolu olması gerekir.
     if GLOBAL_NUM_CLASSES > 0 and 'temp_train_generator' in globals(): # temp_train_generator'ın globalde varlığını kontrol et
         sorted_class_names = [name for name, index in sorted(temp_train_generator.class_indices.items(), key=lambda item: item[1])]

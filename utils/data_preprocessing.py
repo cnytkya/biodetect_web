@@ -53,7 +53,7 @@ def load_and_preprocess_data(data_dir, img_height, img_width, batch_size, valida
 
 if __name__ == '__main__':
     # Test amaçlı kullanım
-    data_dir = '../data/PlantVillage' # Kendi veri setinizin yolunu buraya göre ayarlayın
+    data_dir = '../data/PlantVillage' #veri seti yolu 
     img_height = 128
     img_width = 128
     batch_size = 32

@@ -1,7 +1,7 @@
 # app.py
 from flask import Flask, render_template, request, jsonify
 import tensorflow as tf
-from tensorflow.keras.preprocessing import image # Doğru import yolu
+from tensorflow.keras.preprocessing import image 
 import numpy as np
 import os
 import io
@@ -39,10 +39,6 @@ except Exception as e:
     print(f"Sınıf isimleri yüklenirken hata oluştu: {e}")
     CLASS_NAMES = [] # Hata durumunda boş liste
 
-# NOT: Artık os.listdir kullanmıyoruz, çünkü sınıf isimlerini eğitimde kullanılan sırayla JSON dosyasından okuyoruz.
-# if '.DS_Store' in CLASS_NAMES: # Bu satıra artık ihtiyaç yok, JSON dosyasında .DS_Store olmayacaktır
-#     CLASS_NAMES.remove('.DS_Store')
-# print(f"Yüklenen sınıf isimleri: {CLASS_NAMES}") # Bu satır yukarıdaki try-except bloğuna taşındı
 
 @app.route('/')
 def index():
@@ -76,7 +72,7 @@ def predict():
             predictions = model.predict(img_array)
             predicted_class_index = np.argmax(predictions[0])
             
-            # Tahmin edilen indeksin CLASS_NAMES listesi içinde olduğundan emin ol
+            # Tahmin edilen indeksin CLASS_NAMES listesi içinde olduğundan emin olamamız gerekir. burayı tekrar kontrol edeceğim
             if predicted_class_index < len(CLASS_NAMES):
                 predicted_class_name = CLASS_NAMES[predicted_class_index]
             else:
